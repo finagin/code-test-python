@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from .models import Room, ObjectInRoom
 
@@ -8,15 +9,18 @@ import os
 
 # Create your views here.
 def index(request):
-    roomId = request.session.get('room', int(os.environ.get('ROOM', '1')))
+    room_id = request.session.get('room', os.environ.get('ROOM', '1'))
 
-    return HttpResponseRedirect('/room/' + str(roomId))
+    return HttpResponseRedirect(reverse('room', kwargs={'room_id': room_id}))
 
 
 def room(request, room_id):
-    request.session['room'] = room_id
+    try:
+        room = Room.objects.get(id=room_id)
+    except Room.DoesNotExist:
+        return HttpResponseRedirect(reverse('index'))
 
-    room = Room.objects.get(id=room_id)
+    request.session['room'] = room_id
 
     sub_rooms = room.relation.all().order_by('id')
 
@@ -74,7 +78,7 @@ def db(request):
     rooms_count = 5
     objects_count = 5
     rooms = [None] * rooms_count
-    roomsRelation = [
+    rooms_relation = [
         [2, 5],
         [3, 5],
         [5],
@@ -90,7 +94,7 @@ def db(request):
     os.environ['ROOM'] = str(rooms[0].id)
 
     for i in range(0, rooms_count):
-        for j in roomsRelation[i]:
+        for j in rooms_relation[i]:
             rooms[i].relation.add(rooms[j - 1])
 
     for i in range(0, rooms_count):
