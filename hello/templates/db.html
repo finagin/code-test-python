@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="container">
+        <h2>Create data</h2>
+        <h3>Create {{ rooms_count }} rooms</h3>
+        <h3>Create {{ objects_count }} objects in each of the rooms</h3>
+    <a href="/room/{{ go_to }}"><h4>Go to "Room#{{ go_to }}"</h4></a>
+    </div>
+{% endblock %}
